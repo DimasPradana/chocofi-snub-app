@@ -20,11 +20,14 @@ export async function GET({ url }) {
 		const d = await git(['diff', '--', file]);
 		return json({ diff: d.out });
 	}
-	const [status, log, branch] = await Promise.all([
-		git(['status', '--porcelain']),
+	// zmk-config may be a subdirectory of a larger repo: scope everything to it
+	const [status, log, branch, prefix] = await Promise.all([
+		git(['status', '--porcelain', '--', '.']),
 		git(['log', '--pretty=format:%h%x09%ad%x09%s', '--date=short', '-n', '10']),
-		git(['rev-parse', '--abbrev-ref', 'HEAD'])
+		git(['rev-parse', '--abbrev-ref', 'HEAD']),
+		git(['rev-parse', '--show-prefix'])
 	]);
+	const pre = prefix.out.trim();
 	if (status.code !== 0) return json({ available: false, error: status.err });
 	return json({
 		available: true,
@@ -32,7 +35,10 @@ export async function GET({ url }) {
 		changes: status.out
 			.split('\n')
 			.filter(Boolean)
-			.map((l) => ({ status: l.slice(0, 2).trim(), path: l.slice(3) })),
+			.map((l) => {
+				const path = l.slice(3);
+				return { status: l.slice(0, 2).trim(), path: path.startsWith(pre) ? path.slice(pre.length) : path };
+			}),
 		log: log.out
 			.split('\n')
 			.filter(Boolean)
@@ -46,9 +52,11 @@ export async function GET({ url }) {
 export async function POST({ request }) {
 	const { message, files } = (await request.json()) as { message?: string; files?: string[] };
 	if (!message?.trim()) error(400, 'pesan commit wajib diisi');
-	const add = await git(['add', '--', ...(files?.length ? files : ['.'])]);
+	const paths = files?.length ? files : ['.'];
+	const add = await git(['add', '--', ...paths]);
 	if (add.code !== 0) error(500, add.err);
-	const c = await git(['commit', '-m', message.trim()]);
+	// pathspec keeps the commit limited to zmk-config even if other files are staged
+	const c = await git(['commit', '-m', message.trim(), '--', ...paths]);
 	if (c.code !== 0) error(500, c.err || c.out);
 	return json({ ok: true, output: c.out });
 }

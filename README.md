@@ -17,7 +17,7 @@ docker compose up -d        # buka http://localhost:3737
 
 | Path | Fungsi |
 |---|---|
-| `zmk-config/` | Salinan repo `chocofi-snub`, sumber yang diedit dan di-build (git repo sendiri) |
+| `zmk-config/` | Config ZMK (dulu repo `chocofi-snub`, digabung beserta riwayatnya). Sumber yang diedit dan di-build |
 | `firmware/` | Hasil `.uf2` dan `builds.json` (riwayat build) |
 | volume `build-cache` | Cache build inkremental (build kedua dan seterusnya lebih cepat) |
 
@@ -47,7 +47,8 @@ Kedua container berjalan sebagai uid 1000, jadi file yang ditulis tetap milik us
 
 **Build**
 - Target dibaca dari `build.yaml`. Bisa build semua atau per target, ada opsi pristine, log real-time (SSE), dan tombol unduh `.uf2`, plus panduan flashing.
-- Commit git dari UI. Push dilakukan dari host: `git -C zmk-config push`.
+- Commit git dari UI (hanya file di `zmk-config/`). Push dilakukan dari host: `git push`.
+- GitHub Actions (`.github/workflows/build.yml`) tetap membangun firmware di GitHub, hanya saat ada perubahan di `zmk-config/`. Hasilnya ada di tab Actions → artifact `firmware`.
 
 ## Shortcut
 
@@ -63,6 +64,8 @@ Kedua container berjalan sebagai uid 1000, jadi file yang ditulis tetap milik us
 | `Esc` | Batal pilih |
 
 ## Catatan
+
+- Satu repo berisi aplikasi dan config. Clone, lalu `docker compose up -d`. Pertama kali butuh internet untuk build image.
 
 - **Menambah modul west** (mengubah `zmk-config/config/west.yml`) butuh internet sekali: `docker compose build zmk`. UI akan memperingatkan jika `west.yml` berbeda dari yang di-bake.
 - Identitas commit dari UI bisa diatur di `.env`: `GIT_AUTHOR_NAME=...`, `GIT_AUTHOR_EMAIL=...`.

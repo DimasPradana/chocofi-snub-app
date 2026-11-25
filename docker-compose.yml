@@ -31,10 +31,11 @@ services:
       # localhost only: the app can write zmk-config and has no login. Use ${WEB_BIND:-127.0.0.1}=0.0.0.0 to expose on LAN.
       - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-3737}:3000"
     volumes:
-      - ./zmk-config:/zmk-config
+      # seluruh repo di-mount agar git (commit dari UI) bisa melihat .git
+      - .:/repo
       - ./firmware:/firmware:ro
     environment:
-      ZMK_CONFIG_DIR: /zmk-config
+      ZMK_CONFIG_DIR: /repo/zmk-config
       FIRMWARE_DIR: /firmware
       BUILDER_URL: http://zmk:8080
       ORIGIN: http://localhost:${WEB_PORT:-3737}
