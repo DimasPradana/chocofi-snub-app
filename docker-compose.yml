@@ -1,0 +1,49 @@
+name: chocofi-keymap
+
+services:
+  zmk:
+    build:
+      context: .
+      dockerfile: docker/zmk/Dockerfile
+    image: chocofi-keymap/zmk-builder:v0.3
+    restart: unless-stopped
+    ports:
+      # only for `bun run dev` outside docker; bound to localhost
+      - "127.0.0.1:${BUILDER_PORT:-18080}:8080"
+    volumes:
+      - ./zmk-config:/zmk-config:ro
+      - ./firmware:/firmware
+      - build-cache:/build-cache
+    environment:
+      ZMK_CONFIG_DIR: /zmk-config
+      FIRMWARE_DIR: /firmware
+      BUILD_CACHE_DIR: /build-cache
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+    image: chocofi-keymap/web:latest
+    restart: unless-stopped
+    depends_on:
+      - zmk
+    ports:
+      # localhost only: the app can write zmk-config and has no login. Use ${WEB_BIND:-127.0.0.1}=0.0.0.0 to expose on LAN.
+      - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-3737}:3000"
+    volumes:
+      - ./zmk-config:/zmk-config
+      - ./firmware:/firmware:ro
+    environment:
+      ZMK_CONFIG_DIR: /zmk-config
+      FIRMWARE_DIR: /firmware
+      BUILDER_URL: http://zmk:8080
+      ORIGIN: http://localhost:${WEB_PORT:-3737}
+      BODY_SIZE_LIMIT: 10M
+      # identity for commits made from the UI (override in .env)
+      GIT_AUTHOR_NAME: ${GIT_AUTHOR_NAME:-Snub Keymap}
+      GIT_AUTHOR_EMAIL: ${GIT_AUTHOR_EMAIL:-keymap@localhost}
+      GIT_COMMITTER_NAME: ${GIT_AUTHOR_NAME:-Snub Keymap}
+      GIT_COMMITTER_EMAIL: ${GIT_AUTHOR_EMAIL:-keymap@localhost}
+
+volumes:
+  build-cache:

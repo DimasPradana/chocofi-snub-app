@@ -1,0 +1,9 @@
+firmware/*.uf2
+firmware/builds.json
+.env
+web/node_modules
+web/.svelte-kit
+web/build
+
+# repo keyboard sendiri (git terpisah)
+/zmk-config
