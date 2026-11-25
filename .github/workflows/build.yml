@@ -1,17 +1,18 @@
+# Build firmware di GitHub (layout standar ZMK: config/ dan build.yaml di root).
+# Hanya berjalan saat config keyboard berubah, bukan saat kode aplikasi berubah.
 on:
   push:
     paths:
-      - "zmk-config/**"
+      - "config/**"
+      - "build.yaml"
       - ".github/workflows/build.yml"
   pull_request:
     paths:
-      - "zmk-config/**"
+      - "config/**"
+      - "build.yaml"
       - ".github/workflows/build.yml"
   workflow_dispatch:
 
 jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
-    with:
-      build_matrix_path: zmk-config/build.yaml
-      config_path: zmk-config/config

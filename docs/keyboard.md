@@ -249,22 +249,22 @@ Setiap widget punya `CONFIG_NICE_OLED_WIDGET_<NAMA>_CUSTOM_X` dan `_CUSTOM_Y` (p
 
 - We use side two key as combos for the side bar keys
 
-![special_key_combos.png](docs/chillmin/special_key_combos.png)
+![special_key_combos.png](chillmin/special_key_combos.png)
 
 
 
 ### Number and Symbols Layer 
 
-![numsym_layer](docs/chillmin/numsym_md.png)
+![numsym_layer](chillmin/numsym_md.png)
 - Here we have both num pad and num row
 - Rest of the symbols with some repeats 
 - Design for keeps same use case keys closer.
 
 ## Fun layer
 
-![fun_layer](docs/chillmin/fun_md.png)
+![fun_layer](chillmin/fun_md.png)
 
 ## System layer
 
-![fun_layer](docs/chillmin/sys_md.png)
+![fun_layer](chillmin/sys_md.png)
 

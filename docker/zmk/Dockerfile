@@ -9,13 +9,13 @@ COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
 # West workspace baked into the image: ZMK + Zephyr + HALs + extra modules
 # (zmk-nice-oled) are downloaded ONCE here, so builds need no internet.
 WORKDIR /workspace
-COPY zmk-config/config/west.yml /workspace/config/west.yml
+COPY config/west.yml /workspace/config/west.yml
 RUN west init -l config \
  && west update --narrow --fetch-opt=--depth=1 \
  && west zephyr-export \
  && cp config/west.yml /workspace/.baked-west.yml
 
-# Run as uid 1000 (matches the host user owning ./zmk-config and ./firmware)
+# Run as uid 1000 (matches the host user owning the repo and ./firmware)
 ENV HOME=/home/ubuntu
 RUN git config --system --add safe.directory "*" \
  && HOME=/home/ubuntu west zephyr-export \

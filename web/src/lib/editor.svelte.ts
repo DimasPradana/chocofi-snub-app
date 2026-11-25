@@ -272,7 +272,7 @@ class Editor {
 				this.confMtime = r.mtime;
 				this.confSaved = this.confText;
 			}
-			this.notify('Tersimpan ke zmk-config', 'ok');
+			this.notify('Tersimpan', 'ok');
 			return true;
 		} catch (e) {
 			this.notify(`Gagal menyimpan: ${(e as Error).message}`, 'err');

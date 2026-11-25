@@ -313,7 +313,7 @@
 			</aside>
 		</main>
 	{:else if !editor.parseError}
-		<div class="loading muted">Memuat zmk-config…</div>
+		<div class="loading muted">Memuat config…</div>
 	{/if}
 
 	{#if editor.toast}

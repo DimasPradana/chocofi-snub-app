@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { readdir, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
-import { CONFIG_DIR } from '#lib/server/config';
+import { CONFIG_DIR, CONFIG_PATHS } from '#lib/server/config';
 
 async function walk(dir: string, out: { path: string; size: number; mtime: number }[]) {
 	for (const e of await readdir(dir, { withFileTypes: true })) {
@@ -17,7 +17,12 @@ async function walk(dir: string, out: { path: string; size: number; mtime: numbe
 
 export async function GET() {
 	const files: { path: string; size: number; mtime: number }[] = [];
-	await walk(CONFIG_DIR, files);
+	for (const c of CONFIG_PATHS) {
+		const p = join(CONFIG_DIR, c);
+		const s = await stat(p).catch(() => null);
+		if (s?.isDirectory()) await walk(p, files);
+		else if (s) files.push({ path: c, size: s.size, mtime: s.mtimeMs });
+	}
 	files.sort((a, b) => a.path.localeCompare(b.path));
 	return json({ root: CONFIG_DIR, files });
 }

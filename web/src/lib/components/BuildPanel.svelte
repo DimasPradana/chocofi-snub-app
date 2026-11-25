@@ -129,7 +129,7 @@
 		const d = await r.json();
 		if (!r.ok) editor.notify(d.message ?? 'Commit gagal', 'err');
 		else {
-			editor.notify('Commit dibuat. Push dari host: git -C zmk-config push', 'ok');
+			editor.notify('Commit dibuat. Push dari host: git push', 'ok');
 			commitMsg = '';
 		}
 		loadGit();
@@ -238,7 +238,7 @@
 	</details>
 {/if}
 
-<div class="section-title">Git (zmk-config)</div>
+<div class="section-title">Git (config/ + build.yaml)</div>
 {#if git?.available}
 	<div class="small muted">Branch <code>{git.branch}</code> · {git.changes?.length ?? 0} perubahan</div>
 	{#each git.changes ?? [] as c (c.path)}
@@ -254,7 +254,7 @@
 			<div class="small"><code>{l.hash}</code> <span class="muted">{l.date}</span> {l.subject}</div>
 		{/each}
 	</details>
-	<div class="muted small">Push ke GitHub (butuh internet) dari host: <code>git -C zmk-config push</code></div>
+	<div class="muted small">Push ke GitHub (butuh internet) dari host: <code>git push</code></div>
 {:else}
 	<div class="muted small">Git tidak tersedia.</div>
 {/if}

@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { spawn } from 'node:child_process';
-import { CONFIG_DIR } from '#lib/server/config';
+import { CONFIG_DIR, CONFIG_PATHS } from '#lib/server/config';
 
 function git(args: string[]): Promise<{ code: number; out: string; err: string }> {
 	return new Promise((res) => {
@@ -20,9 +20,9 @@ export async function GET({ url }) {
 		const d = await git(['diff', '--', file]);
 		return json({ diff: d.out });
 	}
-	// zmk-config may be a subdirectory of a larger repo: scope everything to it
+	// the repo also holds the app: scope status/commit to the config paths
 	const [status, log, branch, prefix] = await Promise.all([
-		git(['status', '--porcelain', '--', '.']),
+		git(['status', '--porcelain', '--', ...CONFIG_PATHS]),
 		git(['log', '--pretty=format:%h%x09%ad%x09%s', '--date=short', '-n', '10']),
 		git(['rev-parse', '--abbrev-ref', 'HEAD']),
 		git(['rev-parse', '--show-prefix'])
@@ -52,10 +52,10 @@ export async function GET({ url }) {
 export async function POST({ request }) {
 	const { message, files } = (await request.json()) as { message?: string; files?: string[] };
 	if (!message?.trim()) error(400, 'pesan commit wajib diisi');
-	const paths = files?.length ? files : ['.'];
+	const paths = files?.length ? files : CONFIG_PATHS;
 	const add = await git(['add', '--', ...paths]);
 	if (add.code !== 0) error(500, add.err);
-	// pathspec keeps the commit limited to zmk-config even if other files are staged
+	// pathspec keeps the commit limited to the config even if other files are staged
 	const c = await git(['commit', '-m', message.trim(), '--', ...paths]);
 	if (c.code !== 0) error(500, c.err || c.out);
 	return json({ ok: true, output: c.out });
