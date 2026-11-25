@@ -4,6 +4,3 @@ firmware/builds.json
 web/node_modules
 web/.svelte-kit
 web/build
-
-# repo keyboard sendiri (git terpisah)
-/zmk-config
