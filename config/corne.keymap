@@ -128,11 +128,6 @@
             key-positions = <15 16 17>;
         };
 
-        system_layer_combo {
-            bindings = <&mo 3>;
-            key-positions = <36 37>;
-        };
-
         caps-lock {
             bindings = <&kt CAPSLOCK>;
             key-positions = <5 6>;
